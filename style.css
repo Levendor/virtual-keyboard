@@ -20,9 +20,9 @@
   transition: bottom 0.4s;
 }
 
-.keyboard--hidden {
+/* .keyboard--hidden {
   bottom: -100%;
-}
+} */
 
 .keyboard__keys {
   text-align: center;
@@ -80,3 +80,8 @@
 .keyboard__key--dark {
   background: rgba(0, 0, 0, 0.25);
 }
+
+/* .iconify {
+  width: 24px;
+  height: 24px;
+} */
