@@ -2,7 +2,8 @@ const Keyboard = {
   elements: {
     main: null,
     keysContainer: null,
-    keys: []
+    keys: [],
+    layouts: []
   },
 
   eventHandlers: {
@@ -15,7 +16,7 @@ const Keyboard = {
     capsLock: false,
     shift: false,
     fn: false,
-    language: 'en'
+    language: true
   },
 
   init() {
@@ -26,7 +27,7 @@ const Keyboard = {
     this.elements.keysContainer.classList.add('keyboard__keys');
     this.elements.keysContainer.appendChild(this.createKeys());
 
-    this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__keys');
+    this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__key');
 
     this.elements.main.appendChild(this.elements.keysContainer);
     document.body.appendChild(this.elements.main);
@@ -41,28 +42,28 @@ const Keyboard = {
   createKeys() {
     const fragment = document.createDocumentFragment();
     
-    const keyLayoutENlow = [
+    this.elements.layouts[1] = [
       "\`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
       "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\",
       "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "\'", "enter",
       "shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "\/", "up",
       "done", "EN", "mic", "Fn", "space", "win", "left", "down", "right"
     ];
-    const keyLayoutENupp = [
+    this.elements.layouts[2] = [
       "\`", "!", "\@", "\#", "\$", "\%", "\^", "\&", "\*", "\(", "\)", "\_", "\+", "backspace",
       "tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "{", "}", "|",
       "caps", "A", "S", "D", "F", "G", "H", "J", "K", "L", ":", "\"", "enter",
       "shift", "Z", "X", "C", "V", "B", "N", "M", "<", ">", "\?", "up",
       "done", "EN", "mic", "Fn", "space", "win", "left", "down", "right"
     ];
-    const keyLayoutRUlow = [
+    this.elements.layouts[3] = [
       "ё", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
       "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
       "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
       "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ".", "up",
       "done", "RU", "mic", "Fn", "space", "win", "left", "down", "right"
     ];
-    const keyLayoutRUupp = [
+    this.elements.layouts[4] = [
       "Ё", "!", "\"", "№", ";", "%", ":", "?", "*", "(", ")", "_", "+", "backspace",
       "tab", "Й", "Ц", "У", "К", "Е", "Н", "Г", "Ш", "Щ", "З", "Х", "Ъ", "\/",
       "caps", "Ф", "Ы", "В", "А", "П", "Р", "О", "Л", "Д", "Ж", "Э", "enter",
@@ -74,7 +75,7 @@ const Keyboard = {
       return `<i class="material-icons">${iconName}</i>`;
     };
 
-    keyLayoutENlow.forEach( key => {
+    this.elements.layouts[1].forEach( key => {
       const keyElement = document.createElement('button');
       const insertLineBreak = ['backspace', '\\', 'enter', 'up'].indexOf(key) !== -1;
 
@@ -123,7 +124,7 @@ const Keyboard = {
           keyElement.innerHTML = createIcon('keyboard_arrow_up');
           keyElement.addEventListener('click', () => {
             this.toggleShift();
-            keyElement.classList.toggle('keyboard__key--active', this.properties.shift);            
+            keyElement.classList.toggle('keyboard__key--active', this.properties.shift);
           });
           break;
 
@@ -147,6 +148,7 @@ const Keyboard = {
           keyElement.innerHTML = '<span>EN</span>';
           keyElement.classList.add('language');
           keyElement.addEventListener('click', (e) => {
+            this.properties.language = !this.properties.language;
             this.toggleLanguage(e);
           });
           break;
@@ -175,7 +177,7 @@ const Keyboard = {
           break;
 
         case 'win':
-          keyElement.innerHTML = '<span class="iconify" data-icon="mdi-microsoft-windows"></span>'; //data-inline="false"
+          keyElement.innerHTML = '<span class="iconify" data-icon="mdi-microsoft-windows"></span>';
           keyElement.addEventListener('click', () => {
             
           });
@@ -246,26 +248,25 @@ const Keyboard = {
   },
 
   toggleLanguage(e) {
-    this.properties.language = this.properties.language === 'en' ? 'ru' : 'en';
-    e.target.innerHTML = this.properties.language === 'en' ? '<span>EN</span>' : '<span>RU</span>';
+    e.target.innerHTML = this.properties.language  ? '<span>EN</span>' : '<span>RU</span>';
     for (let i = 0; i < this.elements.keys.length; i++) {
-      if (key.childElementCount === 0) {
+      if (this.elements.keys[i].childElementCount === 0) {
         if (this.properties.shift) {
           switch(this.properties.language) {
-            case 'en': 
-              this.elements.keys[i].textContent = keyLayoutENupp[i];
+            case true:
+              this.elements.keys[i].textContent = this.elements.layouts[2][i];
               break;
-            case 'ru':
-              this.elements.keys[i].textContent = keyLayoutRUupp[i];
+            case false:
+              this.elements.keys[i].textContent = this.elements.layouts[4][i];
               break;
           }
         } else {
           switch(this.properties.language) {
-            case 'en': 
-              this.elements.keys[i].textContent = keyLayoutENlow[i];
+            case true: 
+              this.elements.keys[i].textContent = this.elements.layouts[1][i];
               break;
-            case 'ru':
-              this.elements.keys[i].textContent = keyLayoutRUlow[i];
+            case false:
+              this.elements.keys[i].textContent = this.elements.layouts[3][i];
               break;
           }
         }
