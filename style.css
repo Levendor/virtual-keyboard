@@ -81,7 +81,27 @@
   background: rgba(0, 0, 0, 0.25);
 }
 
-/* .iconify {
-  width: 24px;
-  height: 24px;
-} */
+.iconify {
+  width: 28px;
+  height: 28px;
+}
+
+@media screen and (max-width: 800px) {
+  .keyboard__key {
+    width: 5%;
+    font-size: 0.8rem;
+  }
+
+  .keyboard__key--wide {
+    width: 10%;
+  }
+
+  .keyboard__key--extra-wide {
+    width: 30%;
+  }
+
+  .iconify {
+    width: 20px;
+    height: 20px;
+  }
+}
