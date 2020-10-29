@@ -1,3 +1,3 @@
 # virtual-keyboard
 
-https://levendor.github.com/virtual-keyboard/
+https://levendor.github.io/virtual-keyboard/
