@@ -20,9 +20,9 @@
   transition: bottom 0.4s;
 }
 
-/* .keyboard--hidden {
+.keyboard--hidden {
   bottom: -100%;
-} */
+}
 
 .keyboard__keys {
 	margin: 0 auto;
