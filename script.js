@@ -197,7 +197,8 @@ const Keyboard = {
         case 'left':
           keyElement.innerHTML = createIcon('arrow_back');
           keyElement.addEventListener('click', () => {
-            
+            this.left();
+            input.focus();
           });
           break;
 
@@ -211,7 +212,8 @@ const Keyboard = {
         case 'right':
           keyElement.innerHTML = createIcon('arrow_forward');
           keyElement.addEventListener('click', () => {
-            
+            this.right();
+            input.focus();
           });
           break;
 
@@ -295,7 +297,23 @@ const Keyboard = {
 				}
 				break;
 		}
-	},
+  },
+  
+  left() {
+    if (this.properties.shift) {
+      if (input.selectionDirection == 'forward') {
+        input.selectionEnd--;
+      } else input.selectionStart--;
+    } else input.selectionStart = --input.selectionEnd;
+  },
+
+  right() {
+    if (this.properties.shift) {
+      if (input.selectionDirection == 'backward') {
+        input.selectionStart++;
+      } else input.selectionEnd++;
+    } else input.selectionStart = ++input.selectionEnd;
+  },
 
   open(initialValue) {
     input.placeholder = 'Start typing';
