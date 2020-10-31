@@ -23,9 +23,8 @@ const Keyboard = {
 		layoutCounter: 1
   },
 
-  // selection: document.getSelection();
-
-  init() {
+  init() {    
+    // document.body.insertAdjacentHTML('afterbegin','<div class="overlay"></div>');
     this.elements.main = document.createElement('div');
     this.elements.keysContainer = document.createElement("div");
 
@@ -38,12 +37,25 @@ const Keyboard = {
     this.elements.main.appendChild(this.elements.keysContainer);
     document.body.appendChild(this.elements.main);
 
-    document.addEventListener('click', () => {
+    document.querySelector('html').addEventListener('click', () => {
       input.focus();
     });
 
-    input.addEventListener('focus', (e) => {
+    input.addEventListener('click', () => {
       this.open(input.value);
+    });
+
+    input.addEventListener('focus', () => {
+      this.open(input.value);
+    });
+
+    document.querySelector('.keyboard').setAttribute("onmousedown", "return false");
+
+    input.addEventListener('keypress', (e) => {
+      console.clear();
+      console.log(e.keyCode, e.code);
+      console.log(e);
+      // e.preventDefault();
     });
 		
     this.open(input.value);
@@ -325,7 +337,7 @@ const Keyboard = {
   close(e) {
     input.placeholder = 'Click anywhere';
     this.properties.value = '';
-    this.elements.main.classList.add('keyboard--hidden')
+    this.elements.main.classList.add('keyboard--hidden');
     e.stopPropagation();
   }
 };
