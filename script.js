@@ -56,16 +56,8 @@ const screenKeyboard = {
     this.elements.recognition = new SpeechRecognition();
     this.elements.recognition.interimResults = true;
     this.elements.recognition.lang = 'en-US';
-
-    // input.addEventListener('keydown', (e) => {
-    //   console.clear();
-    //   console.log(e.code);
-    //   console.log(e.keyCode, e.key);
-    //   console.log(e);
-    // });
 		
     this.open(input.value);
-      // input.focus();
   },
 
   createKeys() {
@@ -518,10 +510,13 @@ const screenKeyboard = {
       arrowSound.play();
     }
     if (this.properties.shift) {
-      if (input.selectionDirection == 'backward') {
-        input.selectionStart++;
-      } else {
+      if (input.selectionDirection == 'forward') {
         input.selectionEnd++;
+      } else {
+        if (input.selectionStart == input.selectionEnd){
+          input.selectionEnd++;
+          input.selectionDirection = 'forward';
+        } else input.selectionStart++;
       }
     } else {
       input.selectionStart = ++input.selectionEnd;
@@ -539,18 +534,20 @@ const screenKeyboard = {
     } else {
       this.elements.recognition.removeEventListener('end', this.elements.recognition.start);
     }
+
     e ? this.elements.recognition.start() : this.elements.recognition.abort();
+
     this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
+
     this.elements.recognition.addEventListener('result', event => {
       if (event.results[0].isFinal) {
-        console.log(this.properties.value);
-        console.log(event.results[0][0].transcript);
-
         this.properties.value = event.results[0][0].transcript;
         this.triggerEvent('oninput');
-        this.properties.value = '';
       }
-    });    
+    });
+  },
+
+  resultSpeechToTextarea(event) {
   },
 
   toggleMute() {
