@@ -1,9 +1,12 @@
-const Keyboard = {
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const screenKeyboard = {
   elements: {
     main: null,
     keysContainer: null,
     keys: [],
-    layouts: []
+    layouts: [],
+    recognition: null
   },
 
   eventHandlers: {
@@ -20,11 +23,12 @@ const Keyboard = {
     shift: false,
     fn: false,
     language: true,
+    mic: false,
+    mute: false,
 		layoutCounter: 1
   },
 
-  init() {    
-    // document.body.insertAdjacentHTML('afterbegin','<div class="overlay"></div>');
+  init() {
     this.elements.main = document.createElement('div');
     this.elements.keysContainer = document.createElement("div");
 
@@ -40,25 +44,27 @@ const Keyboard = {
     document.querySelector('html').addEventListener('click', () => {
       input.focus();
     });
-
     input.addEventListener('click', () => {
       this.open(input.value);
     });
-
     input.addEventListener('focus', () => {
       this.open(input.value);
     });
-
     document.querySelector('.keyboard').setAttribute("onmousedown", "return false");
 
-    input.addEventListener('keypress', (e) => {
-      console.clear();
-      console.log(e.keyCode, e.code);
-      console.log(e);
-      // e.preventDefault();
-    });
+    this.elements.recognition = new SpeechRecognition();
+    this.elements.recognition.interimResults = true;
+    this.elements.recognition.lang = 'en-US';
+    this.elements.recognition.continuous = true;
+
+    // input.addEventListener('keydown', (e) => {
+    //   console.clear();
+    //   console.log(e.keyCode, e.key);
+    //   console.log(e);
+    // });
 		
     this.open(input.value);
+      // input.focus();
   },
 
   createKeys() {
@@ -69,28 +75,28 @@ const Keyboard = {
       "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\",
       "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "\'", "enter",
       "shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "\/", "up",
-      "done", "EN", "mic", "space", "win", "left", "down", "right"
+      "done", "EN", "mic", "space", "mute", "left", "down", "right"
     ];
     this.elements.layouts[3] = [
       "\`", "!", "\@", "\#", "\$", "\%", "\^", "\&", "\*", "\(", "\)", "\_", "\+", "backspace",
       "tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "{", "}", "|",
       "caps", "A", "S", "D", "F", "G", "H", "J", "K", "L", ":", "\"", "enter",
       "shift", "Z", "X", "C", "V", "B", "N", "M", "<", ">", "\?", "up",
-      "done", "EN", "mic", "space", "win", "left", "down", "right"
+      "done", "EN", "mic", "space", "mute", "left", "down", "right"
     ];
     this.elements.layouts[0] = [
       "ё", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
       "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
       "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
       "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ".", "up",
-      "done", "RU", "mic", "space", "win", "left", "down", "right"
+      "done", "RU", "mic", "space", "mute", "left", "down", "right"
     ];
     this.elements.layouts[2] = [
       "Ё", "!", "\"", "№", ";", "%", ":", "?", "*", "(", ")", "_", "+", "backspace",
       "tab", "Й", "Ц", "У", "К", "Е", "Н", "Г", "Ш", "Щ", "З", "Х", "Ъ", "\/",
       "caps", "Ф", "Ы", "В", "А", "П", "Р", "О", "Л", "Д", "Ж", "Э", "enter",
       "shift", "Я", "Ч", "С", "М", "И", "Т", "Ь", "Б", "Ю", ",", "up",
-      "done", "RU", "mic", "space", "win", "left", "down", "right"
+      "done", "RU", "mic", "space", "mute", "left", "down", "right"
     ];
 
     const createIcon = (iconName) => {
@@ -115,6 +121,15 @@ const Keyboard = {
             } else this.properties.value = '';
             this.triggerEvent('oninput');
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'Backspace') {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          });
           break;
 
         case 'tab':
@@ -124,6 +139,16 @@ const Keyboard = {
             this.properties.value = '  ';
             this.triggerEvent('oninput');
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          });
+          break;
           break;
 
         case 'caps':
@@ -134,6 +159,15 @@ const Keyboard = {
             this.toggleCapsLock();
             input.focus();
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'CapsLock') {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          }); 
           break;
 
         case 'enter':
@@ -143,6 +177,15 @@ const Keyboard = {
             this.properties.value = '\n';
             this.triggerEvent('oninput');
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          }); 
           break;
 
         case 'shift':
@@ -153,6 +196,28 @@ const Keyboard = {
             this.toggleShift();
             input.focus();
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'Shift') {
+              e.preventDefault();
+              if (!screenKeyboard.properties.shift) {
+                keyElement.click();
+                keyElement.classList.add('click');
+                setTimeout(() => keyElement.classList.remove('click'), 100);
+              }
+            }
+          });
+
+          input.addEventListener("keyup", (e) => {
+            if (e.key === 'Shift') {
+              e.preventDefault();
+              if (screenKeyboard.properties.shift) {
+                keyElement.click();
+                keyElement.classList.add('click');
+                setTimeout(() => keyElement.classList.remove('click'), 100);
+              }
+            }
+          });
           break;
 
         case 'up':
@@ -160,6 +225,14 @@ const Keyboard = {
           keyElement.addEventListener('click', () => {
             
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'ArrowUp') {
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          }); 
           break;
 
         case 'done':
@@ -185,7 +258,10 @@ const Keyboard = {
           keyElement.classList.add('keyboard__key--wide', 'keyboard__key--activatable');
           keyElement.innerHTML = createIcon('mic_off');
           keyElement.addEventListener('click', () => {
-            
+            this.properties.mic = !this.properties.mic;
+            keyElement.innerHTML = this.properties.mic ? createIcon('mic') : createIcon('mic_off');
+            keyElement.classList.toggle('keyboard__key--active', this.properties.mic);
+            this.toggleMic(this.properties.mic);
           });
           break;
 
@@ -196,13 +272,25 @@ const Keyboard = {
             this.properties.value = ' ';
             this.triggerEvent('oninput');
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === ' ') {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          });
           break;
 
-        case 'win':
-          keyElement.classList.add('keyboard__key--wide');
-          keyElement.innerHTML = '<span class="iconify" data-icon="mdi-microsoft-windows"></span>';
+        case 'mute':
+          keyElement.classList.add('keyboard__key--wide', 'keyboard__key--activatable');
+          keyElement.innerHTML = createIcon('volume_up');
           keyElement.addEventListener('click', () => {
-            
+            this.toggleMute();
+            this.properties.mute = !this.properties.mute;
+            keyElement.innerHTML = this.properties.mute ? createIcon('volume_off') : createIcon('volume_up');
+            keyElement.classList.toggle('keyboard__key--active', this.properties.mute);
           });
           break;
 
@@ -212,13 +300,30 @@ const Keyboard = {
             this.left();
             input.focus();
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          });
           break;
 
         case 'down':
           keyElement.innerHTML = createIcon('arrow_downward');
           keyElement.addEventListener('click', () => {
-            
+
           });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'ArrowDown') {
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          }); 
           break;
 
         case 'right':
@@ -226,6 +331,15 @@ const Keyboard = {
           keyElement.addEventListener('click', () => {
             this.right();
             input.focus();
+          });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
           });
           break;
 
@@ -237,7 +351,14 @@ const Keyboard = {
             this.triggerEvent("oninput");
           });
 
-          break;
+          input.addEventListener("keydown", (e) => {
+            if (e.key === keyElement.textContent) {
+              e.preventDefault();
+              keyElement.click();
+              keyElement.classList.add('click');
+              setTimeout(() => keyElement.classList.remove('click'), 100);
+            }
+          });
       }
 
       fragment.appendChild(keyElement);
@@ -270,8 +391,9 @@ const Keyboard = {
   },
 
   toggleLanguage(e) {
-    e.target.innerHTML = this.properties.language  ? '<span>EN</span>' : '<span>RU</span>';
+    e.target.innerHTML = this.properties.language ? '<span>EN</span>' : '<span>RU</span>';
 		this.properties.layoutCounter += this.properties.language  ? 1 : -1;
+    this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
 		this.updateKeyboard();
   },
 	
@@ -313,18 +435,46 @@ const Keyboard = {
   
   left() {
     if (this.properties.shift) {
-      if (input.selectionDirection == 'forward') {
+      if (input.selectionDirection == 'backward') {
+        input.selectionStart--;
+      } else {
         input.selectionEnd--;
-      } else input.selectionStart--;
-    } else input.selectionStart = --input.selectionEnd;
+      }
+    } else {
+      input.selectionStart = --input.selectionEnd;
+    }
   },
 
   right() {
     if (this.properties.shift) {
       if (input.selectionDirection == 'backward') {
         input.selectionStart++;
-      } else input.selectionEnd++;
-    } else input.selectionStart = ++input.selectionEnd;
+      } else {
+        input.selectionEnd++;
+      }
+    } else {
+      input.selectionStart = ++input.selectionEnd;
+    }
+  },
+
+  toggleMic(e) {
+    if (e) {
+      this.elements.recognition.addEventListener('end', this.elements.recognition.start);
+    } else {
+      this.elements.recognition.removeEventListener('end', this.elements.recognition.start);
+    }
+    e ? this.elements.recognition.start() : this.elements.recognition.stop();
+    this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
+    this.elements.recognition.addEventListener('result', event => {
+      if (event.results[0].isFinal) {
+        this.properties.value = event.results[0][0].transcript;
+        this.triggerEvent('oninput');
+      }
+    });    
+  },
+
+  toggleMute() {
+
   },
 
   open(initialValue) {
@@ -343,5 +493,5 @@ const Keyboard = {
 };
 
 window.addEventListener("DOMContentLoaded", function () {
-  Keyboard.init();
+  screenKeyboard.init();
 });
