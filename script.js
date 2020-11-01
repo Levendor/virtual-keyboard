@@ -55,14 +55,13 @@ const screenKeyboard = {
     this.elements.recognition = new SpeechRecognition();
     this.elements.recognition.interimResults = true;
     this.elements.recognition.lang = 'en-US';
-    this.elements.recognition.continuous = true;
 
-    input.addEventListener('keydown', (e) => {
-      console.clear();
-      console.log(e.code);
-      console.log(e.keyCode, e.key);
-      console.log(e);
-    });
+    // input.addEventListener('keydown', (e) => {
+    //   console.clear();
+    //   console.log(e.code);
+    //   console.log(e.keyCode, e.key);
+    //   console.log(e);
+    // });
 		
     this.open(input.value);
       // input.focus();
