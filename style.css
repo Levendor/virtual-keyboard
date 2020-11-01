@@ -20,11 +20,13 @@
   transition: bottom 0.4s;
 }
 
-/* .keyboard--hidden {
+.keyboard--hidden {
   bottom: -100%;
-} */
+}
 
 .keyboard__keys {
+	margin: 0 auto;
+	max-width: 840px;
   text-align: center;
 }
 
@@ -49,6 +51,7 @@
   position: relative;
 }
 
+.click,
 .keyboard__key:active {
   background: rgba(255, 255, 255, 0.12);
 }
@@ -58,7 +61,7 @@
 }
 
 .keyboard__key--extra-wide {
-  width: 36%;
+  width: 32%;
   max-width: 500px;
 }
 
@@ -86,7 +89,7 @@
   height: 28px;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 820px) {
   .keyboard__key {
     width: 5%;
     font-size: 0.8rem;
