@@ -56,16 +56,8 @@ const screenKeyboard = {
     this.elements.recognition = new SpeechRecognition();
     this.elements.recognition.interimResults = true;
     this.elements.recognition.lang = 'en-US';
-
-    // input.addEventListener('keydown', (e) => {
-    //   console.clear();
-    //   console.log(e.code);
-    //   console.log(e.keyCode, e.key);
-    //   console.log(e);
-    // });
 		
     this.open(input.value);
-      // input.focus();
   },
 
   createKeys() {
@@ -542,15 +534,20 @@ const screenKeyboard = {
     } else {
       this.elements.recognition.removeEventListener('end', this.elements.recognition.start);
     }
-    e ? this.elements.recognition.start() : this.elements.recognition.stop();
+
+    e ? this.elements.recognition.start() : this.elements.recognition.abort();
+
     this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
+
     this.elements.recognition.addEventListener('result', event => {
       if (event.results[0].isFinal) {
         this.properties.value = event.results[0][0].transcript;
         this.triggerEvent('oninput');
-        this.properties.value = '';
       }
-    });    
+    });
+  },
+
+  resultSpeechToTextarea(event) {
   },
 
   toggleMute() {
