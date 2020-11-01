@@ -25,6 +25,7 @@ const screenKeyboard = {
     language: true,
     mic: false,
     mute: false,
+    selectionDirection: false,
 		layoutCounter: 1
   },
 
@@ -55,10 +56,10 @@ const screenKeyboard = {
     this.elements.recognition = new SpeechRecognition();
     this.elements.recognition.interimResults = true;
     this.elements.recognition.lang = 'en-US';
-    this.elements.recognition.continuous = true;
 
     // input.addEventListener('keydown', (e) => {
     //   console.clear();
+    //   console.log(e.code);
     //   console.log(e.keyCode, e.key);
     //   console.log(e);
     // });
@@ -98,12 +99,19 @@ const screenKeyboard = {
       "shift", "Я", "Ч", "С", "М", "И", "Т", "Ь", "Б", "Ю", ",", "up",
       "done", "RU", "mic", "space", "mute", "left", "down", "right"
     ];
+    this.elements.layouts[4] = [
+      "Backquote", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Digit0", "Minus", "Equal", "Backspace",
+      "Tab", "KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "KeyI", "KeyO", "KeyP", "BracketLeft", "BracketRight", "Backslash",
+      "CapsLock", "KeyA", "KeyS", "KeyD", "KeyF", "KeyG", "KeyH", "KeyJ", "KeyK", "KeyL", "Semicolon", "Quote", "Enter",
+      "ShiftLeft", "KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "Comma", "Period", "Slash", "ArrowUp",
+      "Done", "Lang", "Mic", "Space", "Mute", "ArrowLeft", "ArrowDown", "ArrowRight"
+    ];
 
     const createIcon = (iconName) => {
       return `<i class="material-icons">${iconName}</i>`;
     };
 
-    this.elements.layouts[1].forEach( key => {
+    this.elements.layouts[1].forEach( (key, index) => {
       const keyElement = document.createElement('button');
       const insertLineBreak = ['backspace', '\\', 'enter', 'up'].indexOf(key) !== -1;
 
@@ -115,6 +123,10 @@ const screenKeyboard = {
           keyElement.classList.add('keyboard__key--wide');
           keyElement.innerHTML = createIcon('backspace');
           keyElement.addEventListener('click', () => {
+            if (!this.properties.mute) {
+              backspaceSound.currentTime = 0;
+              backspaceSound.play();
+            }
             if (input.selectionStart == input.selectionEnd) {
               input.selectionStart = 0;
               this.properties.value = input.value.slice(0, input.selectionEnd).substring(0, input.selectionEnd - 1);
@@ -136,6 +148,10 @@ const screenKeyboard = {
           keyElement.classList.add('keyboard__key--wide');
           keyElement.innerHTML = createIcon('keyboard_tab');
           keyElement.addEventListener('click', () => {
+            if (!this.properties.mute) {
+              tabSound.currentTime = 0;
+              tabSound.play();
+            }
             this.properties.value = '  ';
             this.triggerEvent('oninput');
           });
@@ -174,6 +190,10 @@ const screenKeyboard = {
           keyElement.classList.add('keyboard__key--wide');
           keyElement.innerHTML = createIcon('keyboard_return');
           keyElement.addEventListener('click', () => {
+            if (!this.properties.mute) {
+              enterSound.currentTime = 0;
+              enterSound.play();
+            }
             this.properties.value = '\n';
             this.triggerEvent('oninput');
           });
@@ -223,7 +243,7 @@ const screenKeyboard = {
         case 'up':
           keyElement.innerHTML = createIcon('arrow_upward');
           keyElement.addEventListener('click', () => {
-            
+            this.up();
           });
 
           input.addEventListener("keydown", (e) => {
@@ -269,6 +289,10 @@ const screenKeyboard = {
           keyElement.classList.add('keyboard__key--extra-wide');
           keyElement.innerHTML = createIcon('space_bar');
           keyElement.addEventListener('click', () => {
+            if (!this.properties.mute) {
+              spaceSound.currentTime = 0;
+              spaceSound.play();
+            }
             this.properties.value = ' ';
             this.triggerEvent('oninput');
           });
@@ -288,7 +312,6 @@ const screenKeyboard = {
           keyElement.innerHTML = createIcon('volume_up');
           keyElement.addEventListener('click', () => {
             this.toggleMute();
-            this.properties.mute = !this.properties.mute;
             keyElement.innerHTML = this.properties.mute ? createIcon('volume_off') : createIcon('volume_up');
             keyElement.classList.toggle('keyboard__key--active', this.properties.mute);
           });
@@ -314,7 +337,7 @@ const screenKeyboard = {
         case 'down':
           keyElement.innerHTML = createIcon('arrow_downward');
           keyElement.addEventListener('click', () => {
-
+            this.down();
           });
 
           input.addEventListener("keydown", (e) => {
@@ -345,14 +368,24 @@ const screenKeyboard = {
 
         default:
           keyElement.textContent = key.toLowerCase();
+          keyElement.id = this.elements.layouts[4][index];
 
           keyElement.addEventListener("click", () => {
+            if (!this.properties.mute) {
+              if (this.properties.language) {
+                defaultENSound.currentTime = 0;
+                defaultENSound.play();
+              } else {
+                defaultRUSound.currentTime = 0;
+                defaultRUSound.play();
+              }
+            }
             this.properties.value = keyElement.textContent;
             this.triggerEvent("oninput");
           });
 
           input.addEventListener("keydown", (e) => {
-            if (e.key === keyElement.textContent) {
+            if (e.code === keyElement.id) {
               e.preventDefault();
               keyElement.click();
               keyElement.classList.add('click');
@@ -378,12 +411,21 @@ const screenKeyboard = {
   },
 
   toggleCapsLock() {
+    if (!this.properties.mute) {
+      capslockSound.currentTime = 0;
+      capslockSound.play();
+    }
     this.properties.capsLock = !this.properties.capsLock;
 		this.updateKeyboard();
     caps.classList.toggle('keyboard__key--active', this.properties.capsLock);
+
   },
 
   toggleShift() {
+    if (!this.properties.mute) {
+      shiftSound.currentTime = 0;
+      shiftSound.play();
+    }
     this.properties.shift = !this.properties.shift;
 		this.properties.layoutCounter += this.properties.shift  ? 2 : -2;
 		this.updateKeyboard();
@@ -391,6 +433,10 @@ const screenKeyboard = {
   },
 
   toggleLanguage(e) {
+    if (!this.properties.mute) {
+      langSound.currentTime = 0;
+      langSound.play();
+    }
     e.target.innerHTML = this.properties.language ? '<span>EN</span>' : '<span>RU</span>';
 		this.properties.layoutCounter += this.properties.language  ? 1 : -1;
     this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
@@ -432,13 +478,34 @@ const screenKeyboard = {
 				break;
 		}
   },
+
+  up() {
+    if (!this.properties.mute) {
+      arrowSound.currentTime = 0;
+      arrowSound.play();
+    }
+  },
+
+  down() {
+    if (!this.properties.mute) {
+      arrowSound.currentTime = 0;
+      arrowSound.play();
+    }
+  },
   
   left() {
+    if (!this.properties.mute) {
+      arrowSound.currentTime = 0;
+      arrowSound.play();
+    }
     if (this.properties.shift) {
       if (input.selectionDirection == 'backward') {
         input.selectionStart--;
       } else {
-        input.selectionEnd--;
+        if (input.selectionStart == input.selectionEnd){
+          input.selectionStart--;
+          input.selectionDirection = 'backward';
+        } else input.selectionEnd--;
       }
     } else {
       input.selectionStart = --input.selectionEnd;
@@ -446,6 +513,10 @@ const screenKeyboard = {
   },
 
   right() {
+    if (!this.properties.mute) {
+      arrowSound.currentTime = 0;
+      arrowSound.play();
+    }
     if (this.properties.shift) {
       if (input.selectionDirection == 'backward') {
         input.selectionStart++;
@@ -458,23 +529,36 @@ const screenKeyboard = {
   },
 
   toggleMic(e) {
+    if (!this.properties.mute) {
+      micSound.currentTime = 0;
+      micSound.play();
+    }
+
     if (e) {
       this.elements.recognition.addEventListener('end', this.elements.recognition.start);
     } else {
       this.elements.recognition.removeEventListener('end', this.elements.recognition.start);
     }
-    e ? this.elements.recognition.start() : this.elements.recognition.stop();
+    e ? this.elements.recognition.start() : this.elements.recognition.abort();
     this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
     this.elements.recognition.addEventListener('result', event => {
       if (event.results[0].isFinal) {
+        console.log(this.properties.value);
+        console.log(event.results[0][0].transcript);
+
         this.properties.value = event.results[0][0].transcript;
         this.triggerEvent('oninput');
+        this.properties.value = '';
       }
     });    
   },
 
   toggleMute() {
-
+    this.properties.mute = !this.properties.mute;
+    if (!this.properties.mute) {
+      muteSound.currentTime = 0;
+      muteSound.play();
+    }
   },
 
   open(initialValue) {
