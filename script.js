@@ -25,6 +25,7 @@ const screenKeyboard = {
     language: true,
     mic: false,
     mute: false,
+    selectionDirection: false,
 		layoutCounter: 1
   },
 
@@ -501,7 +502,10 @@ const screenKeyboard = {
       if (input.selectionDirection == 'backward') {
         input.selectionStart--;
       } else {
-        input.selectionEnd--;
+        if (input.selectionStart == input.selectionEnd){
+          input.selectionStart--;
+          input.selectionDirection = 'backward';
+        } else input.selectionEnd--;
       }
     } else {
       input.selectionStart = --input.selectionEnd;
