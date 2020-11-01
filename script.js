@@ -52,10 +52,6 @@ const screenKeyboard = {
       this.open(input.value);
     });
     document.querySelector('.keyboard').setAttribute("onmousedown", "return false");
-
-    this.elements.recognition = new SpeechRecognition();
-    this.elements.recognition.interimResults = true;
-    this.elements.recognition.lang = 'en-US';
 		
     this.open(input.value);
   },
@@ -431,7 +427,6 @@ const screenKeyboard = {
     }
     e.target.innerHTML = this.properties.language ? '<span>EN</span>' : '<span>RU</span>';
 		this.properties.layoutCounter += this.properties.language  ? 1 : -1;
-    this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
 		this.updateKeyboard();
   },
 	
@@ -530,24 +525,22 @@ const screenKeyboard = {
     }
 
     if (e) {
+      this.elements.recognition = new SpeechRecognition();
+      this.elements.recognition.interimResults = true;
+      this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
       this.elements.recognition.addEventListener('end', this.elements.recognition.start);
+      this.elements.recognition.start();
+      this.elements.recognition.addEventListener('result', event => {
+        if (event.results[0].isFinal) {
+          this.properties.value = event.results[event.results.length-1][0].transcript;
+          this.triggerEvent('oninput');
+        }
+      });
     } else {
       this.elements.recognition.removeEventListener('end', this.elements.recognition.start);
+      this.elements.recognition.abort()
+      this.elements.recognition = null;
     }
-
-    e ? this.elements.recognition.start() : this.elements.recognition.abort();
-
-    this.elements.recognition.lang = this.properties.language ? 'en-US' : 'ru-RU';
-
-    this.elements.recognition.addEventListener('result', event => {
-      if (event.results[0].isFinal) {
-        this.properties.value = event.results[0][0].transcript;
-        this.triggerEvent('oninput');
-      }
-    });
-  },
-
-  resultSpeechToTextarea(event) {
   },
 
   toggleMute() {
